@@ -1,9 +1,21 @@
 from selenium import webdriver
 import requests
 
+from contextlib import contextmanager
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import  staleness_of
 class Core():
 	driver = None
 	base_handle = None
+
+	@contextmanager
+	def wait_for_page_load(self, timeout=30):
+		old_page = self.driver.find_element_by_tag_name('html')
+		yield
+		WebDriverWait(self.driver, timeout).until(
+			staleness_of(old_page)
+		)
+
 
 	def __init__(self):
 		pass
@@ -19,7 +31,7 @@ class Core():
 		self.driver.quit()
 
 	def getRequestsSession(self):
-		cookies = self.driver.get_cookies()
+		cookies = self.driver.get_cookies()	
 
 		s = requests.Session()
 		for cookie in cookies:
